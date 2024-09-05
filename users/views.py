@@ -85,7 +85,7 @@ class LoginView(APIView):
             400: ValidationErrorSerializer
         }
     ),
-    patch=extend_schema(  # user malumotlarni yangilash uchun patch qo'shildi
+    patch=extend_schema(
         summary="Update user information",
         request=UserUpdateSerializer,
         responses={

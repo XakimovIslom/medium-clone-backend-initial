@@ -92,9 +92,10 @@ DATABASES = {
 
 # DRF
 REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',   # drf_spectacular swagger uchun sozlamalar
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',  # drf_spectacular swagger uchun sozlamalar
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',        # swagger orqali authenticate qilishda username va password orqali kirishga ruxsat berish uchun
+        'rest_framework.authentication.BasicAuthentication',
+        # swagger orqali authenticate qilishda username va password orqali kirishga ruxsat berish uchun
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
@@ -104,7 +105,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 10,
 }
-
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Medium',

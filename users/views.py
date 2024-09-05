@@ -5,12 +5,22 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from .serializers import UserSerializer, LoginSerializer, ValidationErrorSerializer, TokenResponseSerializer
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from .serializers import UserSerializer, LoginSerializer
 
 User = get_user_model()
 
-
+@extend_schema_view(
+    post=extend_schema(
+        summary="Sign up a new user",
+        request=UserSerializer,
+        responses={
+            201: UserSerializer,
+            400: ValidationErrorSerializer
+        }
+    )
+)
 # SignUp qilish uchun class
 class SignupView(APIView):
     serializer_class = UserSerializer
@@ -28,6 +38,17 @@ class SignupView(APIView):
                 'access': str(refresh.access_token),
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@extend_schema_view(
+    post=extend_schema(
+        summary="Log in a user",
+        request=LoginSerializer,
+        responses={
+            200: TokenResponseSerializer,
+            400: ValidationErrorSerializer,
+        }
+    )
+)
 
 
 # Login qilish uchun class
@@ -53,6 +74,16 @@ class LoginView(APIView):
             }, status=status.HTTP_200_OK)
         else:
             return Response({'detail': 'Hisob maʼlumotlari yaroqsiz'}, status=status.HTTP_401_UNAUTHORIZED)
+
+@extend_schema_view(
+    get=extend_schema(
+        summary="Get user information",
+        responses={
+            200: UserSerializer,
+            400: ValidationErrorSerializer
+        }
+    )
+)
 
 
 # User malumotlarni olish uchum class

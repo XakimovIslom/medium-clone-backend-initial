@@ -1,15 +1,18 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
-from rest_framework import status, permissions, generics
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import status, permissions, generics, parsers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import UserSerializer, LoginSerializer, ValidationErrorSerializer, TokenResponseSerializer
-from drf_spectacular.utils import extend_schema, extend_schema_view
+
 from .serializers import UserSerializer, LoginSerializer
+from .serializers import ValidationErrorSerializer, TokenResponseSerializer, \
+    UserUpdateSerializer
 
 User = get_user_model()
+
 
 @extend_schema_view(
     post=extend_schema(
@@ -39,6 +42,7 @@ class SignupView(APIView):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @extend_schema_view(
     post=extend_schema(
         summary="Log in a user",
@@ -49,8 +53,6 @@ class SignupView(APIView):
         }
     )
 )
-
-
 # Login qilish uchun class
 class LoginView(APIView):
     serializer_class = LoginSerializer
@@ -75,6 +77,7 @@ class LoginView(APIView):
         else:
             return Response({'detail': 'Hisob maʼlumotlari yaroqsiz'}, status=status.HTTP_401_UNAUTHORIZED)
 
+
 @extend_schema_view(
     get=extend_schema(
         summary="Get user information",
@@ -82,14 +85,21 @@ class LoginView(APIView):
             200: UserSerializer,
             400: ValidationErrorSerializer
         }
+    ),
+    patch=extend_schema(  # user malumotlarni yangilash uchun patch qo'shildi
+        summary="Update user information",
+        request=UserUpdateSerializer,
+        responses={
+            200: UserUpdateSerializer,
+            400: ValidationErrorSerializer
+        }
     )
 )
-
-
 # User malumotlarni olish uchum class
 class UsersMe(generics.RetrieveAPIView, generics.UpdateAPIView):
-    http_method_names = ['get', ]
+    http_method_names = ['get', 'patch']
     queryset = User.objects.filter(is_active=True)
+    parser_classes = [parsers.MultiPartParser]
     permission_classes = (IsAuthenticated,)
 
     def get_object(self):
@@ -97,3 +107,6 @@ class UsersMe(generics.RetrieveAPIView, generics.UpdateAPIView):
 
     def get_serializer_class(self):
         return UserSerializer
+
+    def patch(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)

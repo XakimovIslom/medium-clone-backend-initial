@@ -1,13 +1,13 @@
-from django.contrib.auth.models import AbstractUser
-from django.db import models
 import os
-import uuid
-from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.core import validators
-from users.errors import BIRTH_YEAR_ERROR_MSG
 
+from django.conf import settings
+from django.contrib.auth.models import AbstractUser
+from django.core import validators
+from django.core.exceptions import ValidationError
+from django.db import models
 from django_resized import ResizedImageField
+
+from users.errors import BIRTH_YEAR_ERROR_MSG
 
 
 def file_upload(instance, filename):

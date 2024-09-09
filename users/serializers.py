@@ -1,8 +1,10 @@
+from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from django.conf import settings
+
 from users.errors import BIRTH_YEAR_ERROR_MSG
+
 User = get_user_model()
 
 
@@ -65,7 +67,7 @@ class ValidationErrorSerializer(serializers.Serializer):
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'middle_name', 'email', 'avatar']
+        fields = ['id', 'first_name', 'last_name', 'middle_name', 'email', 'avatar', 'birth_year']
 
     def validate_birth_year(self, value):  # tug'ilgan yil oralig'ini tekshirish uchun to'rtinchi variant
         if not (settings.BIRTH_YEAR_MIN < value < settings.BIRTH_YEAR_MAX):

@@ -1,16 +1,18 @@
-from rest_framework import status, permissions, generics, parsers # parsers yangi qo'shildi
+from django.contrib.auth import authenticate
+from django.contrib.auth import get_user_model
+from django_redis import get_redis_connection
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework import status, permissions, generics, parsers  # parsers yangi qo'shildi
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import IsAuthenticated
+
 from .serializers import (
     UserSerializer, LoginSerializer, ValidationErrorSerializer, TokenResponseSerializer,
-    UserUpdateSerializer # UserUpdateSerializer yangi qo'shildi
+    UserUpdateSerializer
 )
-from django.contrib.auth import get_user_model
-from drf_spectacular.utils import extend_schema, extend_schema_view
-from django_redis import get_redis_connection
+from .services import UserService
 
 User = get_user_model()
 
@@ -87,7 +89,7 @@ class LoginView(APIView):
             400: ValidationErrorSerializer
         }
     ),
-    patch=extend_schema(                   # user malumotlarni yangilash uchun patch qo'shildi
+    patch=extend_schema(  # user malumotlarni yangilash uchun patch qo'shildi
         summary="Update user information",
         request=UserUpdateSerializer,
         responses={
@@ -96,11 +98,10 @@ class LoginView(APIView):
         }
     )
 )
-
 class UsersMe(generics.RetrieveAPIView, generics.UpdateAPIView):
-    http_method_names = ['get', 'patch']             # patch qo'shildi
+    http_method_names = ['get', 'patch']  # patch qo'shildi
     queryset = User.objects.filter(is_active=True)
-    parser_classes = [parsers.MultiPartParser]       # fayl yuklash uchun MultiPartParser qo'shildi
+    parser_classes = [parsers.MultiPartParser]  # fayl yuklash uchun MultiPartParser qo'shildi
     permission_classes = (IsAuthenticated,)
 
     def get_object(self):
@@ -112,7 +113,6 @@ class UsersMe(generics.RetrieveAPIView, generics.UpdateAPIView):
         return UserSerializer
 
     def patch(self, request, *args, **kwargs):
-
         redis_conn = get_redis_connection('default')
         redis_conn.set('test_key', 'test_value', ex=3600)
         cached_value = redis_conn.get('test_key')
@@ -121,3 +121,20 @@ class UsersMe(generics.RetrieveAPIView, generics.UpdateAPIView):
         return super().partial_update(request, *args, **kwargs)
 
 
+@extend_schema_view(
+    post=extend_schema(
+        summary="Log out a user",
+        request=None,
+        responses={
+            200: ValidationErrorSerializer,
+            401: ValidationErrorSerializer
+        }
+    )
+)
+class LogoutView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(responses=None)
+    def post(self, request, *args, **kwargs):
+        UserService.create_tokens(request.user, access='fake_token', refresh='fake_token', is_force_add_to_redis=True)
+        return Response({"detail": "Mufaqqiyatli chiqildi."})

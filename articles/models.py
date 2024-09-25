@@ -12,6 +12,12 @@ class Topic(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        db_table = 'topic'
+        verbose_name = 'Topic'
+        verbose_name_plural = 'Topics'
+        ordering = ['name']
+
 
 class Article(models.Model):
     class Status(models.TextChoices):

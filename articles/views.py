@@ -14,14 +14,7 @@ class ArticlesView(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-
-        data = {
-            "title": serializer.data.get('title'),
-            "summary": serializer.data.get('summary'),
-            "content": serializer.data.get('content'),
-            "topic_ids": serializer.data.get('topics')
-        }
-        return Response(data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
         article = self.get_object()

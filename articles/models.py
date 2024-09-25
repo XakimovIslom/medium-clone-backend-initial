@@ -24,7 +24,7 @@ class Article(models.Model):
         pending = 'Pending', 'Pending'
         publish = 'Publish', 'Publish'
 
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=200)
     summary = models.TextField()
     content = models.TextField()

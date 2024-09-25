@@ -34,7 +34,10 @@ class Article(models.Model):
         return self.title
 
     class Meta:
-        db_table = 'Article'
+        db_table = 'article'
+        verbose_name = 'Article'
+        verbose_name_plural = 'Articles'
+        ordering = ['-created_at']
 
 
 class Clap(models.Model):

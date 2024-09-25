@@ -34,7 +34,7 @@ class Article(models.Model):
         return self.title
 
     class Meta:
-        db_table = 'articles_article'
+        db_table = 'article'
 
 
 class Clap(models.Model):

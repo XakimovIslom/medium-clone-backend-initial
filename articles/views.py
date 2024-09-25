@@ -1,4 +1,3 @@
-from pip._vendor.rich.status import Status
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -10,7 +9,6 @@ from articles.serializers import ArticleCreateSerializer
 class ArticlesView(ModelViewSet):
     queryset = Article.objects.filter(status=Article.Status.publish)
     serializer_class = ArticleCreateSerializer
-
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

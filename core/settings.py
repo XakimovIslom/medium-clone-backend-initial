@@ -1,8 +1,13 @@
+import os
+import sys
 from datetime import timedelta, datetime
 from pathlib import Path
-import os
-from django.utils.translation import gettext_lazy as _
+
 from decouple import config
+from django.utils.translation import gettext_lazy as _
+from loguru import logger
+
+from .custom_logging import InterceptHandler
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,6 +52,7 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     'core.middlewares.CustomLocaleMiddleware',  # custom middleware uchun
     'django.middleware.locale.LocaleMiddleware',  # locale middleware
+    'core.middlewares.LogRequestMiddleware',
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -169,7 +175,6 @@ LOCALE_PATHS = [
     os.path.join(BASE_DIR, 'locale/'),
 ]
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
@@ -229,6 +234,7 @@ REDIS_PORT = config('REDIS_PORT', default='6379')
 REDIS_DB = config('REDIS_DB', default='1')
 
 REDIS_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
+logger.info(f"Using redis | URL: {REDIS_URL}")
 
 CACHES = {
     'default': {
@@ -254,3 +260,28 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', default='')
 EMAIL_PORT = config('EMAIL_PORT', default='')
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+
+# LOGURU settings
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'intercept': {
+            '()': InterceptHandler,
+            'level': 0,
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'django.log',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['intercept', 'file'],
+            'level': "DEBUG",
+            'propagate': True,
+        },
+    }
+}

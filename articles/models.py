@@ -33,6 +33,9 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
+    class Meta:
+        db_table = 'articles_article'
+
 
 class Clap(models.Model):
     article = models.ForeignKey(Article, related_name='claps', on_delete=models.CASCADE)

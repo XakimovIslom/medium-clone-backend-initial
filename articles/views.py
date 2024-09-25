@@ -7,7 +7,7 @@ from articles.serializers import ArticleCreateSerializer
 
 
 class ArticlesView(ModelViewSet):
-    queryset = Article.objects.filter(status=Article.Status.publish)
+    queryset = Article.objects.all()
     serializer_class = ArticleCreateSerializer
 
     def create(self, request, *args, **kwargs):
